@@ -40,17 +40,48 @@ Required values:
 - `ALLOWED_FOLDER_ID`
 - `CONFLUENCE_BASE_URL`
 
-## Setup
+## First-time setup
 
-```bash
-cd /path/to/confluence-mcp
-python -m venv venv
-source venv/bin/activate
-python -m pip install -r requirements.txt
-cp .env.example .env
-```
+1. **Install prerequisites**
+   - Git
+   - Python 3.10+ (3.11 or newer is fine)
+   - A Confluence account with access to the target space/folder
 
-Fill in `.env` with your real values.
+2. **Clone the repo**
+   ```bash
+   git clone <YOUR_GITHUB_REPO_URL> confluence-mcp
+   cd confluence-mcp
+   ```
+
+3. **Create an Atlassian API token**
+   - Open https://id.atlassian.com/manage-profile/security/api-tokens
+   - Click **Create API token**
+   - Copy the token and store it securely
+   - Use your Atlassian email address as the username
+
+4. **Create your local `.env` file**
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` and fill in:
+   - `ATLASSIAN_EMAIL`
+   - `ATLASSIAN_API_TOKEN`
+   - `CONFLUENCE_BASE_URL`
+   - `ALLOWED_FOLDER_ID`
+
+5. **Install Python dependencies**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   python -m pip install -r requirements.txt
+   ```
+
+6. **Check that authentication works**
+   ```bash
+   python diagnose.py
+   ```
+   If Basic Auth fails, the token or email is wrong. If Bearer auth works, the
+   token is valid for Atlassian’s API gateway.
 
 ## Run the server
 
