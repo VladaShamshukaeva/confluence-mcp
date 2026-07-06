@@ -2,7 +2,7 @@
   "mcpServers": {
     "confluence": {
       "command": "python3",
-      "args": ["/Users/vladashamshukaeva/confluence-local-mcp/server.py"]
+      "args": ["/path/to/confluence-mcp/server.py"]
     }
   }
 }

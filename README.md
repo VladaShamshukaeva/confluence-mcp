@@ -43,7 +43,7 @@ Required values:
 ## Setup
 
 ```bash
-cd /Users/vladashamshukaeva/confluence-local-mcp
+cd /path/to/confluence-mcp
 python -m venv venv
 source venv/bin/activate
 python -m pip install -r requirements.txt
@@ -70,7 +70,7 @@ Use this JSON in your Claude Code MCP config:
   "mcpServers": {
     "confluence": {
       "command": "python3",
-      "args": ["/Users/vladashamshukaeva/confluence-local-mcp/server.py"]
+      "args": ["/path/to/confluence-mcp/server.py"]
     }
   }
 }
@@ -85,7 +85,7 @@ If your environment exposes `python` as the interpreter alias, you can swap
 ## Repo layout
 
 ```text
-confluence-local-mcp/
+confluence-mcp/
   server.py
   requirements.txt
   .env.example
