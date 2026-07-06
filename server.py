@@ -616,11 +616,9 @@ def call_tool(name: str, args: dict[str, Any] | None) -> str:
 # ============================================================================
 
 def send_message(message: dict[str, Any]) -> None:
-    data = json.dumps(message, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-    header = f"Content-Length: {len(data)}\r\n\r\n".encode("ascii")
-    sys.stdout.buffer.write(header)
-    sys.stdout.buffer.write(data)
-    sys.stdout.buffer.flush()
+    data = json.dumps(message, separators=(",", ":"), ensure_ascii=False)
+    sys.stdout.write(data + "\n")
+    sys.stdout.flush()
 
 
 def send_result(message_id: Any, result: Any) -> None:
@@ -635,29 +633,14 @@ def send_error(message_id: Any, code: int, message: str, data: Any | None = None
 
 
 def read_message() -> dict[str, Any] | None:
-    headers: dict[str, str] = {}
-    while True:
-        line = sys.stdin.buffer.readline()
-        if not line:
-            return None
-        if line in (b"\r\n", b"\n"):
-            break
-        try:
-            key, value = line.decode("utf-8", errors="replace").split(":", 1)
-        except ValueError:
-            continue
-        headers[key.strip().lower()] = value.strip()
-
-    content_length = headers.get("content-length")
-    if not content_length:
-        raise JsonRpcError(-32600, "Invalid Request", {"reason": "Missing Content-Length header"})
-
-    body = sys.stdin.buffer.read(int(content_length))
-    if not body:
-        raise JsonRpcError(-32700, "Parse error", {"reason": "Empty message body"})
-
+    line = sys.stdin.readline()
+    if not line:
+        return None
+    line = line.strip()
+    if not line:
+        return None
     try:
-        return json.loads(body.decode("utf-8"))
+        return json.loads(line)
     except json.JSONDecodeError as exc:
         raise JsonRpcError(-32700, "Parse error", {"reason": str(exc)}) from exc
 
