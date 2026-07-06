@@ -5,6 +5,20 @@ import base64
 import urllib.request
 import sys
 import json
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+PROJECT_ROOT = Path(__file__).resolve().parent
+
+
+def load_project_dotenv() -> None:
+    dotenv_path = PROJECT_ROOT / ".env"
+    if dotenv_path.exists():
+        load_dotenv(dotenv_path, override=True)
+
+
+load_project_dotenv()
 
 email = os.getenv('ATLASSIAN_EMAIL')
 token = os.getenv('ATLASSIAN_API_TOKEN')
@@ -137,5 +151,4 @@ This suggests:
 """)
 
 print("="*60)
-
 

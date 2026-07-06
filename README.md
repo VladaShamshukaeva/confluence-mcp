@@ -71,14 +71,14 @@ Required values:
 
 5. **Install Python dependencies**
    ```bash
-   python -m venv venv
+   python3 -m venv venv
    source venv/bin/activate
-   python -m pip install -r requirements.txt
+   python3 -m pip install -r requirements.txt
    ```
 
 6. **Check that authentication works**
    ```bash
-   python diagnose.py
+   python3 diagnose.py
    ```
    If Basic Auth fails, the token or email is wrong. If Bearer auth works, the
    token is valid for Atlassian’s API gateway.
@@ -86,7 +86,7 @@ Required values:
 ## Run the server
 
 ```bash
-python server.py
+python3 server.py
 ```
 
 The server speaks MCP over stdio, so it is usually started by your MCP client
@@ -98,7 +98,7 @@ Use this JSON in your Claude Code MCP config:
 
 ```json
 {
-  "mcpServers": {
+  "servers": {
     "confluence": {
       "command": "python3",
       "args": ["/path/to/confluence-mcp/server.py"]
