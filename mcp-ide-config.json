@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "confluence": {
+      "command": "python3",
+      "args": ["/Users/vladashamshukaeva/confluence-local-mcp/server.py"],
+      "env": {
+        "ATLASSIAN_EMAIL": "${ATLASSIAN_EMAIL}",
+        "ATLASSIAN_API_TOKEN": "${ATLASSIAN_API_TOKEN}",
+        "ALLOWED_FOLDER_ID": "${ALLOWED_FOLDER_ID}"
+      }
+    }
+  }
+}
+
