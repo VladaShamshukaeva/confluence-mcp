@@ -100,8 +100,8 @@ Use this JSON in your Claude Code MCP config:
 {
   "servers": {
     "confluence": {
-      "command": "python3",
-      "args": ["/path/to/confluence-mcp/server.py"]
+      "command": "/Library/Developer/CommandLineTools/usr/bin/python3",
+      "args": ["-u", "/path/to/confluence-mcp/server.py"]
     }
   }
 }
