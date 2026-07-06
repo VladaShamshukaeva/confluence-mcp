@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""Local Confluence MCP server rewritten in Python.
-
-This mirrors the existing TypeScript server:
-- stdio JSON-RPC / MCP transport
+"""Local Confluence MCP server written in Python:
 - read/search tools
 - create/update page tools constrained to ALLOWED_FOLDER_ID
 - Basic Auth using ATLASSIAN_EMAIL + ATLASSIAN_API_TOKEN
@@ -118,7 +115,7 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "create_confluence_page",
-        "description": "Create a Confluence page in the allowed folder (ALLOWED_FOLDER_ID). Resolves spaceId from the folder via Confluence v2, then moves the page under the folder.",
+        "description": "Create a page in ALLOWED_FOLDER_ID.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -133,7 +130,7 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "update_confluence_page",
-        "description": "Update an existing Confluence page in the allowed folder (ALLOWED_FOLDER_ID). Verifies page is under the folder before updating.",
+        "description": "Update a page in ALLOWED_FOLDER_ID.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -338,7 +335,7 @@ def assert_folder_write_allowed(page: dict[str, Any], action: str) -> None:
     allowed_folder_id = require_allowed_folder_id()
     if not is_folder_in_ancestors(page, allowed_folder_id):
         raise RuntimeError(
-            f"{action} blocked: page is not a descendant of ALLOWED_FOLDER_ID '{allowed_folder_id}'."
+        f"{action} blocked: page is outside ALLOWED_FOLDER_ID '{allowed_folder_id}'."
         )
 
 
@@ -752,4 +749,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -1,6 +1,6 @@
 # Confluence Local MCP Server
 
-A local Model Context Protocol server for Confluence Cloud, rewritten in Python.
+A local Model Context Protocol server for Confluence Cloud, written in Python.
 It connects directly to the Confluence REST API using Basic Auth and reads secrets
 from a local `.env` file via `python-dotenv`.
 
@@ -70,19 +70,14 @@ Use this JSON in your Claude Code MCP config:
   "mcpServers": {
     "confluence": {
       "command": "python3",
-      "args": ["/Users/vladashamshukaeva/confluence-local-mcp/server.py"],
-      "env": {
-        "ATLASSIAN_EMAIL": "${ATLASSIAN_EMAIL}",
-        "ATLASSIAN_API_TOKEN": "${ATLASSIAN_API_TOKEN}",
-        "ALLOWED_FOLDER_ID": "${ALLOWED_FOLDER_ID}"
-      }
+      "args": ["/Users/vladashamshukaeva/confluence-local-mcp/server.py"]
     }
   }
 }
 ```
 
-`server.py` still reads the local `.env` file, so your real credentials stay out
-of the MCP config.
+`server.py` reads the local `.env` file, so your real credentials stay out of
+the MCP config.
 
 If your environment exposes `python` as the interpreter alias, you can swap
 `python3` back to `python` in this JSON.
@@ -105,4 +100,3 @@ confluence-local-mcp/
 - Tokens are never hardcoded in source.
 - The write tools are limited to `ALLOWED_FOLDER_ID`.
 - Page bodies are capped at 1 MB.
-
