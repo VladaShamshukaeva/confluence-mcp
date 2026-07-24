@@ -4,6 +4,11 @@ A local Model Context Protocol server for Confluence Cloud, written in Python.
 It connects directly to the Confluence REST API using Basic Auth and reads secrets
 from a local `.env` file via `python-dotenv`.
 
+The write tools can also publish draw.io diagrams in two ways:
+
+- upload an existing local `.drawio` or `.xml` file
+- generate a draw.io file from instructions and/or source files, then publish it
+
 ## What the server exposes
 
 The Python server preserves the original 5 Confluence tools:
@@ -13,8 +18,11 @@ The Python server preserves the original 5 Confluence tools:
 | `search_confluence_pages` | Search pages by keyword, topic, or business term |
 | `read_confluence_page` | Read a page by numeric page ID |
 | `get_page_children` | List direct child pages of a parent page |
-| `create_confluence_page` | Create a page in the allowed folder |
-| `update_confluence_page` | Update an existing page in the allowed folder |
+| `create_confluence_page` | Create a page in one of the allowed folders |
+| `update_confluence_page` | Update an existing page in one of the allowed folders |
+
+The tool surface stays fixed at 5 tools. Diagram publishing is exposed through
+the existing write tools rather than a new dedicated tool.
 
 ## How it works
 
@@ -37,7 +45,7 @@ Required values:
 
 - `ATLASSIAN_EMAIL`
 - `ATLASSIAN_API_TOKEN`
-- `ALLOWED_FOLDER_ID`
+- `ALLOWED_FOLDER_IDS` (preferred) or `ALLOWED_FOLDER_ID` (legacy fallback)
 - `CONFLUENCE_BASE_URL`
 
 ## First-time setup
@@ -67,7 +75,12 @@ Required values:
    - `ATLASSIAN_EMAIL`
    - `ATLASSIAN_API_TOKEN`
    - `CONFLUENCE_BASE_URL`
-   - `ALLOWED_FOLDER_ID`
+   - `ALLOWED_FOLDER_IDS`
+
+   Example:
+   ```bash
+   ALLOWED_FOLDER_IDS="149215320868,149328101920"
+   ```
 
 5. **Install Python dependencies**
    ```bash
@@ -129,5 +142,80 @@ confluence-mcp/
 
 - `.env` is ignored by Git.
 - Tokens are never hardcoded in source.
-- The write tools are limited to `ALLOWED_FOLDER_ID`.
+- The write tools are limited to folders listed in `ALLOWED_FOLDER_IDS`.
 - Page bodies are capped at 1 MB.
+
+## draw.io diagram publishing
+
+`create_confluence_page` and `update_confluence_page` accept an optional
+`drawIoDiagramPaths` array.
+
+Example:
+
+```json
+{
+   "title": "Store Fulfillment Flow",
+   "drawIoDiagramPaths": [
+      "/absolute/path/to/fulfillment-flow.drawio"
+   ]
+}
+```
+
+Behavior:
+
+- Each local `.drawio` or `.xml` file is uploaded as an attachment on the
+   target page.
+- The server inserts a draw.io macro into the page body that references the
+   uploaded attachment by filename.
+- You can combine `drawIoDiagramPaths` with `body`, `sourcePageId`,
+   `sourcePageTitle`, `javaSourcePaths`, or `figmaScreenshotPaths`.
+
+Requirements:
+
+- The draw.io for Confluence app must already be installed in your Confluence
+   Cloud instance, otherwise the macro will not render.
+- Attachment filenames must be unique within a single MCP call.
+
+## generated draw.io diagrams
+
+`create_confluence_page` and `update_confluence_page` also accept these optional
+fields for generated diagrams:
+
+- `diagramInstructions`: natural-language instructions or step list
+- `diagramSourcePaths`: local file or directory paths to summarize into the diagram
+- `diagramFileName`: optional attachment filename for the generated `.drawio`
+
+Example using instructions only:
+
+```json
+{
+   "title": "Fulfillment Flow",
+   "diagramInstructions": "1. Load config\n2. Fetch work items\n3. Assign task\n4. Complete task"
+}
+```
+
+Example using instructions plus code:
+
+```json
+{
+   "title": "FPZ Replenishment Flow",
+   "diagramInstructions": "Show the main FPZ replenishment steps from app boot through task completion.",
+   "diagramSourcePaths": [
+      "/absolute/path/to/docs/FPZ_API_Contracts.md",
+      "/absolute/path/to/src/main/java"
+   ],
+   "diagramFileName": "fpz-replenishment-generated.drawio"
+}
+```
+
+Behavior:
+
+- The server generates a simple left-to-right draw.io flowchart locally.
+- It uses `diagramInstructions` as the primary step list when provided.
+- It appends summarized nodes from `diagramSourcePaths` when provided.
+- The generated `.drawio` file is uploaded as a Confluence attachment and embedded with the existing draw.io macro path.
+
+Notes:
+
+- This is intentionally lightweight generation; it creates a straightforward flowchart rather than a full semantic architecture diagram.
+- `javaSourcePaths` still controls page-body summaries; `diagramSourcePaths` is specifically for diagram generation.
